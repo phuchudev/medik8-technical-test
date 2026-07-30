@@ -6,6 +6,8 @@
   reloading the page.
 {%- enddoc -%}
 
+{{ 'section-product-highlight.css' | asset_url | stylesheet_tag }}
+
 {%- liquid
   assign section_heading = section.settings.heading
   assign section_description = section.settings.description
