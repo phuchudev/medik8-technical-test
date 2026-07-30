@@ -7,6 +7,7 @@
 {%- enddoc -%}
 
 {{ 'section-product-highlight.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'product-highlight.js' | asset_url }}" defer></script>
 
 {%- liquid
   assign section_heading = section.settings.heading
@@ -17,7 +18,7 @@
   endif
 -%}
 
-<section class="product-highlight">
+<product-highlight class="product-highlight">
   <div class="page-width">
     <div class="product-highlight__container">
       <div class="product-highlight__content">
@@ -38,14 +39,30 @@
         {%- if featured_product != blank -%}
           <div class="product-highlight__selector">
             {%- for block in section.blocks -%}
-              {%- assign product = block.settings.product -%}
+              {%- liquid
+                assign product = block.settings.product 
+              -%}
 
               {%- if product != blank -%}
+                {%- capture product_data -%}
+                  {
+                    "title": {{ product.title | json }},
+                    "price": {{ product.price | money_with_currency | json }},
+                    "description": {{ product.description | strip_html | truncatewords: 30 | json }},
+                    "url": {{ product.url | json }},
+                    "image": {{ product.featured_image | image_url: width: 800 | default: '' | json }},
+                    "imageAlt": {{ product.featured_image.alt | default: '' | json }} 
+                  }
+                {%- endcapture -%}
+
                 <button
                   class="product-highlight__selector-item{% if forloop.first %} is-active{% endif %}"
                   type="button"
+                  aria-pressed="{% if forloop.first %}true{% else %}false{% endif %}"
                   data-product-id="{{ product.id }}"
+                  data-product='{{ product_data | strip }}'
                   {{ block.shopify_attributes }}
+                  js-product-highlight="item"
                 >
                   {%- if product.featured_image -%}
                     <span class="product-highlight__selector-image">
@@ -80,29 +97,32 @@
                   | image_tag:
                     loading: 'lazy',
                     class: 'product-highlight__image',
-                    alt: featured_product.featured_image.alt
+                    alt: featured_product.featured_image.alt,
+                    js_product_highlight: 'image'
                 }}
               </div>
             {%- endif -%}
 
             <div class="product-highlight__featured-content">
-              <h3 class="product-highlight__title">
+              <h3 class="product-highlight__title" js-product-highlight="title">
                 {{ featured_product.title }}
               </h3>
 
-              <p class="product-highlight__price">
+              <p class="product-highlight__price" js-product-highlight="price">
                 {{ featured_product.price | money_with_currency }}
               </p>
 
-              {%- if featured_product.description != blank -%}
-                <div class="product-highlight__product-description rte">
-                  {{ featured_product.description | strip_html | truncatewords: 30 }}
-                </div>
-              {%- endif -%}
+              <div 
+                class="product-highlight__product-description rte"
+                js-product-highlight="description"
+              >
+                {{ featured_product.description | strip_html | truncatewords: 30 }}
+              </div>
 
               <a
                 href="{{ featured_product.url }}"
-                class="button button--primary"
+                class="button button--primary product-highlight__link"
+                js-product-highlight="link"
               >
                 View product
               </a>
@@ -117,7 +137,7 @@
       </div>
     </div>
   </div>
-</section>
+</product-highlight>
 
 {% schema %}
 {
