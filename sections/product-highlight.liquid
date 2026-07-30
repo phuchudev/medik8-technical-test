@@ -9,6 +9,10 @@
 {%- liquid
   assign section_heading = section.settings.heading
   assign section_description = section.settings.description
+
+  if section.blocks.size > 0
+    assign featured_product = section.blocks.first.settings.product
+  endif
 -%}
 
 <section class="product-highlight">
@@ -29,6 +33,85 @@
       </div>
 
       <div class="product-highlight__products">
+        {%- if featured_product != blank -%}
+          <div class="product-highlight__selector">
+            {%- for block in section.blocks -%}
+              {%- assign product = block.settings.product -%}
+
+              {%- if product != blank -%}
+                <button
+                  class="product-highlight__selector-item{% if forloop.first %} is-active{% endif %}"
+                  type="button"
+                  data-product-id="{{ product.id }}"
+                  {{ block.shopify_attributes }}
+                >
+                  {%- if product.featured_image -%}
+                    <span class="product-highlight__selector-image">
+                      {{
+                        product.featured_image
+                        | image_url: width: 200
+                        | image_tag:
+                          loading: 'lazy',
+                          widths: '100,200',
+                          sizes: '100px',
+                          width: 100,
+                          height: 100,
+                          alt: product.featured_image.alt
+                      }}
+                    </span>
+                  {%- endif -%}
+
+                  <span class="product-highlight__selector-title">
+                    {{ product.title }}
+                  </span>
+                </button>
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+
+          <div class="product-highlight__featured">
+            {%- if featured_product.featured_image -%}
+              <div class="product-highlight__featured-media">
+                {{
+                  featured_product.featured_image
+                  | image_url: width: 800
+                  | image_tag:
+                    loading: 'lazy',
+                    class: 'product-highlight__image',
+                    alt: featured_product.featured_image.alt
+                }}
+              </div>
+            {%- endif -%}
+
+            <div class="product-highlight__featured-content">
+              <h3 class="product-highlight__title">
+                {{ featured_product.title }}
+              </h3>
+
+              <p class="product-highlight__price">
+                {{ featured_product.price | money_with_currency }}
+              </p>
+
+              {%- if featured_product.description != blank -%}
+                <div class="product-highlight__product-description rte">
+                  {{ featured_product.description | strip_html | truncatewords: 30 }}
+                </div>
+              {%- endif -%}
+
+              <a
+                href="{{ featured_product.url }}"
+                class="button button--primary"
+              >
+                View product
+              </a>
+            </div>
+          </div>
+
+        {%- else -%}
+          <p class="product-highlight__empty">
+            Add up to three product blocks to display this section.
+          </p>
+        {%- endif -%}
       </div>
     </div>
   </div>
@@ -53,6 +136,21 @@
       "default": "<p>Discover our featured skincare products.</p>"
     }
   ],
+  "blocks": [
+    {
+      "type": "product",
+      "name": "Product",
+      "limit": 3,
+      "settings": [
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Product"
+        }
+      ]
+    }
+  ],
+  "max_blocks": 3,
   "presets": [
     {
       "name": "Product Highlight"
