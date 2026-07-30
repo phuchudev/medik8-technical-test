@@ -1,0 +1,62 @@
+{%- doc -%}
+  Product Highlight
+
+  A configurable Shopify theme section that allows merchants to feature
+  up to three products. Customers can switch between products without
+  reloading the page.
+{%- enddoc -%}
+
+{%- liquid
+  assign section_heading = section.settings.heading
+  assign section_description = section.settings.description
+-%}
+
+<section class="product-highlight">
+  <div class="page-width">
+    <div class="product-highlight__container">
+      <div class="product-highlight__content">
+        {%- if section_heading != blank -%}
+          <h2 class="product-highlight__heading">
+            {{ section_heading }}
+          </h2>
+        {%- endif -%}
+
+        {%- if section_description != blank -%}
+          <div class="product-highlight__description rte">
+            {{ section_description }}
+          </div>
+        {%- endif -%}
+      </div>
+
+      <div class="product-highlight__products">
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Product Highlight",
+  "tag": "section",
+  "class": "section-product-highlight",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Product Highlight"
+    },
+    {
+      "type": "richtext",
+      "id": "description",
+      "label": "Description",
+      "default": "<p>Discover our featured skincare products.</p>"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product Highlight"
+    }
+  ]
+}
+{% endschema %}
