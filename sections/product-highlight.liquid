@@ -124,14 +124,14 @@
                 class="button button--primary product-highlight__link"
                 js-product-highlight="link"
               >
-                View product
+                {{ 'sections.product_highlight.view_product' | t }}
               </a>
             </div>
           </div>
 
         {%- else -%}
           <p class="product-highlight__empty">
-            Add up to three product blocks to display this section.
+            {{ 'sections.product_highlight.view_product' | t }}
           </p>
         {%- endif -%}
       </div>
